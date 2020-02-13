@@ -1,5 +1,6 @@
 import scrapy
 from scrapy_splash import SplashRequest
+from ..items import CareerspiderItem
 
 
 class CareerFairSpider(scrapy.Spider):
@@ -8,7 +9,7 @@ class CareerFairSpider(scrapy.Spider):
 
     def start_requests(self):
         for url in self.start_urls:
-            yield SplashRequest(url=url, callback=self.parse, endpoint='render.html', args={'wait': 0.5, 'http_method': 'GET'})
+            yield SplashRequest(url=url, callback=self.parse, endpoint='render.html', args={'wait': 3, 'http_method': 'GET'})
 
 
     def parse(self, response):
@@ -18,14 +19,18 @@ class CareerFairSpider(scrapy.Spider):
             URL_SELECTOR = 'a ::attr(href)'
             detail_page = employer.css(URL_SELECTOR).get()
             if detail_page:
-                yield SplashRequest(url='https://app.thefairsapp.com/'+detail_page, callback=self.parse2, endpoint='render.html', args={'wait': 1, 'http_method': 'GET'})
+                yield SplashRequest(url='https://app.thefairsapp.com/'+detail_page, callback=self.parse2, endpoint='render.html', args={'wait': 3, 'http_method': 'GET'})
     
     def parse2(self, response):
+        items = CareerspiderItem()
         CONTAINER_SELECTOR = '.employer-container'
         container = response.css(CONTAINER_SELECTOR)
         if container:
-            NAME_SELECTOR = 'h5 ::text'
-            yield {
-                'name': container.css(NAME_SELECTOR).get(),
-            }
+            NAME_SELECTOR = '.solo-employer-header h5 ::text'
+            OPTCPT_SELECTOR = ".whitelabel-text-primary:contains('OPT/CPT') + ul li ::text"
+            VISA_SELECTOR = ".whitelabel-text-primary:contains('Sponsorship') + ul li ::text"
+            items['name'] = container.css(NAME_SELECTOR).get()
+            items['opt_cpt'] = container.css(OPTCPT_SELECTOR).get()
+            items['sponsorship'] = container.css(VISA_SELECTOR).get()
+            return items
         

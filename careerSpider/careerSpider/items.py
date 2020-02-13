@@ -9,6 +9,6 @@ import scrapy
 
 
 class CareerspiderItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    name = scrapy.Field()
+    opt_cpt = scrapy.Field()
+    sponsorship = scrapy.Field()
