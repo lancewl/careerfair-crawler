@@ -10,5 +10,7 @@ import scrapy
 
 class CareerspiderItem(scrapy.Item):
     name = scrapy.Field()
+    industry = scrapy.Field()
+    job = scrapy.Field()
     opt_cpt = scrapy.Field()
     sponsorship = scrapy.Field()
